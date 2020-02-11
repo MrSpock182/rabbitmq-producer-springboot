@@ -2,6 +2,9 @@ server:
   port: 8081
 spring:
   rabbitmq:
+    listener:
+      simple:
+        default-requeue-rejected: false
     request:
       host: localhost
       port: 5672
@@ -11,5 +14,7 @@ spring:
         producer: ex.producer.aula-spring
       routing-key:
         producer: rk.producer.aula-spring
-      deadletter:
+      dead-letter:
         producer: dl.producer.aula-spring
+      parking-lot:
+        producer: pl.producer.aula-spring
