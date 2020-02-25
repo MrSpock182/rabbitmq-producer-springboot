@@ -5,9 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Configuration
 public class ProducerRabbitConfiguration {
 
@@ -19,19 +16,6 @@ public class ProducerRabbitConfiguration {
 
     @Value("${spring.rabbitmq.request.dead-letter.producer}")
     private String deadLetter;
-
-    @Value("${spring.rabbitmq.request.parking-lot.producer}")
-    private String parkingLot;
-
-    @Bean
-    TopicExchange exchange() {
-        return new TopicExchange(exchange);
-    }
-
-//    @Bean
-//    DirectExchange directExchange() {
-//        return new DirectExchange(exchange);
-//    }
 
     @Bean
     Queue queue() {
@@ -46,28 +30,24 @@ public class ProducerRabbitConfiguration {
         return QueueBuilder.durable(deadLetter)
                 .deadLetterExchange(exchange)
                 .deadLetterRoutingKey(routingKey)
-                .ttl(5000)
                 .build();
     }
 
     @Bean
-    Queue parkinglotQueue() {
-        return new Queue(parkingLot);
+    DirectExchange directExchange() {
+        return new DirectExchange(exchange);
     }
 
     @Bean
     Binding bindingQueue() {
-        return BindingBuilder.bind(queue()).to(exchange()).with(routingKey);
+        return BindingBuilder.bind(queue())
+                .to(directExchange()).with(routingKey);
     }
 
     @Bean
-    Binding bindingDeadLetter(){
-        return BindingBuilder.bind(deadLetter()).to(exchange()).with(deadLetter);
-    }
-
-    @Bean
-    Binding bindingParkingLot() {
-        return BindingBuilder.bind(parkinglotQueue()).to(exchange()).with(parkingLot);
+    Binding bindingDeadLetter() {
+        return BindingBuilder.bind(deadLetter())
+                .to(directExchange()).with(deadLetter);
     }
 
 }
