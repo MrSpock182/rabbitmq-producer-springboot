@@ -20,9 +20,9 @@ public class RabbitConfiguration {
     private ConnectionFactory connectionFactory;
 
     @Bean
-    public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory() {
+    public SimpleRabbitListenerContainerFactory factory(SimpleRabbitListenerContainerFactoryConfigurer simpleRabbitListener) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
+        simpleRabbitListener.configure(factory, connectionFactory);
         factory.setMessageConverter(jacksonConverter());
         return factory;
     }
@@ -42,15 +42,6 @@ public class RabbitConfiguration {
                 .dateFormat(new StdDateFormat())
                 .build();
         return new Jackson2JsonMessageConverter(mapper);
-    }
-
-    @Bean
-    public SimpleRabbitListenerContainerFactory factory(ConnectionFactory connectionFactory,
-                                                        SimpleRabbitListenerContainerFactoryConfigurer configurer) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        configurer.configure(factory, connectionFactory);
-        factory.setMessageConverter(jacksonConverter());
-        return factory;
     }
 
 }

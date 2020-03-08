@@ -17,6 +17,14 @@ public class ProducerRabbitConfiguration {
     @Value("${spring.rabbitmq.request.dead-letter.producer}")
     private String deadLetter;
 
+    @Value("${spring.rabbitmq.request.parking-lot.producer}")
+    private String parkingLot;
+
+    @Bean
+    DirectExchange directExchange() {
+        return new DirectExchange(exchange);
+    }
+
     @Bean
     Queue queue() {
         return QueueBuilder.durable(routingKey)
@@ -34,8 +42,8 @@ public class ProducerRabbitConfiguration {
     }
 
     @Bean
-    DirectExchange directExchange() {
-        return new DirectExchange(exchange);
+    Queue parkingLot() {
+        return new Queue(parkingLot);
     }
 
     @Bean
@@ -48,6 +56,12 @@ public class ProducerRabbitConfiguration {
     Binding bindingDeadLetter() {
         return BindingBuilder.bind(deadLetter())
                 .to(directExchange()).with(deadLetter);
+    }
+
+    @Bean
+    Binding bindingParkingLot() {
+        return BindingBuilder.bind(parkingLot())
+                .to(directExchange()).with(parkingLot);
     }
 
 }
